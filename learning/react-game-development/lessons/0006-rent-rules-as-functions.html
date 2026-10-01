@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 0006: Rent Rules As Functions</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <script src="../assets/quiz.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">React Game Development - Lesson 0006</p>
+        <h1>Rent Rules As Functions</h1>
+        <p>
+          Your win for this lesson: know where to look when the game gives, removes, or displays rent rewards.
+        </p>
+      </header>
+
+      <h2>The Big Idea</h2>
+      <p>
+        Milestone 4 added game rules. A game rule answers a question from saved data: "is rent paid?", "how long is
+        the streak?", or "should this undo remove the reward?" Those answers live in <code>src/gameMath.ts</code>.
+      </p>
+
+      <p>
+        Related source:
+        <a href="https://react.dev/learn/updating-objects-in-state" target="_blank" rel="noreferrer">
+          React: Updating Objects in State
+        </a>.
+      </p>
+
+      <h2>One Rule In Plain English</h2>
+      <pre><code>export function isRentPaidForDate(activityEntries, localDate) {
+  return getRentPointsForDate(activityEntries, localDate) &gt;= dailyRentTarget;
+}</code></pre>
+
+      <p>
+        Read it as: "add up the rent points for this date; rent is paid if the total reaches the target."
+      </p>
+
+      <h2>How Undo Uses The Rule</h2>
+      <pre><code>const nextActivityEntries =
+  save.activityEntries.filter((entry) =&gt; entry.id !== entryId);
+
+if (isRentPaidForDate(nextActivityEntries, removedEntry.localDate)) {
+  keep the paid-day reward
+} else {
+  remove the paid-day reward
+}</code></pre>
+
+      <p>
+        That is why undo can be honest. The app does not ask "was rent paid before?" It asks "after this correction,
+        is rent still paid?"
+      </p>
+
+      <section class="task">
+        <h2>Practice In The Code</h2>
+        <p>
+          Open <code>src/gameMath.ts</code>. Find <code>getRentPointsForDate</code>, then find every function that
+          calls it.
+        </p>
+      </section>
+
+      <section class="quiz">
+        <h2>Quick Check</h2>
+        <p data-prompt>
+          Which file decides whether rent is paid?
+        </p>
+        <button data-answer="src/gameMath.ts" onclick="teachQuiz.answer(this, 'rent-paid-file', 'src/gameMath.ts', 'game-rules-as-functions', 'ui-versus-rule-location')">
+          src/gameMath.ts
+        </button>
+        <button data-answer="src/styles.css" onclick="teachQuiz.answer(this, 'rent-paid-file', 'src/gameMath.ts', 'game-rules-as-functions', 'ui-versus-rule-location')">
+          src/styles.css
+        </button>
+        <button data-answer="index.html" onclick="teachQuiz.answer(this, 'rent-paid-file', 'src/gameMath.ts', 'game-rules-as-functions', 'ui-versus-rule-location')">
+          index.html
+        </button>
+        <p class="feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="task">
+        <h2>Explain It Back</h2>
+        <p>
+          In one or two sentences: why is it useful that rent and streak rules are in <code>gameMath.ts</code> instead
+          of buried directly in JSX?
+        </p>
+        <textarea onblur="teachQuiz.saveResponse(this, 'explain-game-math-purpose', 'separating-game-rules-from-ui')"></textarea>
+      </section>
+
+      <h2>Go Deeper</h2>
+      <ol>
+        <li>Why does undo check the activity list after removal instead of before removal?</li>
+        <li>Why is a test easier to write for <code>isRentPaidForDate</code> than for the whole React screen?</li>
+      </ol>
+
+      <h2>Reference</h2>
+      <p>
+        Keep this nearby:
+        <a href="../reference/game-rule-functions.html">Game Rule Functions Reference</a>.
+      </p>
+
+      <section class="teacher-context">
+        <h2>Teacher Context</h2>
+        <p>
+          After you answer, this box gives you a summary you can paste back into chat.
+        </p>
+        <textarea data-teacher-context readonly></textarea>
+      </section>
+
+      <p class="muted">
+        Ask me followup questions about reading <code>gameMath.ts</code>, the undo flow, or how the tests prove the
+        rule.
+      </p>
+    </main>
+  </body>
+</html>

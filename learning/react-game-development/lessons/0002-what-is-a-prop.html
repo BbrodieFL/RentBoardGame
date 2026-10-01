@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 0002: What Is a Prop?</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <script src="../assets/quiz.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">React Game Development - Lesson 0002</p>
+        <h1>What Is a Prop?</h1>
+        <p>
+          Your win for this lesson: explain <code>&lt;StatCard stat={stat} /&gt;</code> without flinching.
+        </p>
+      </header>
+
+      <h2>The Mental Model</h2>
+      <p>
+        A prop is data a parent component gives to a child component. The official React docs say parent
+        components pass information to child components by giving them props, and props can be ordinary values,
+        objects, arrays, functions, or JSX.
+      </p>
+      <p>
+        Primary source:
+        <a href="https://react.dev/learn/passing-props-to-a-component" target="_blank" rel="noreferrer">
+          React: Passing Props to a Component
+        </a>.
+      </p>
+
+      <h2>Normal Function First</h2>
+      <pre><code>function greet(name) {
+  return `Hello, ${name}`;
+}
+
+greet("Oliver");</code></pre>
+      <p>
+        <code>name</code> is an input. The function can use it without knowing where it came from.
+      </p>
+
+      <h2>React Component Version</h2>
+      <pre><code>function StatusChip({ label, value }) {
+  return (
+    &lt;div&gt;
+      &lt;span&gt;{label}&lt;/span&gt;
+      &lt;strong&gt;{value}&lt;/strong&gt;
+    &lt;/div&gt;
+  );
+}
+
+&lt;StatusChip label="Coins" value="140" /&gt;</code></pre>
+      <p>
+        <code>label</code> and <code>value</code> are props. The parent says, “render a status chip, and here is
+        the data it should use.”
+      </p>
+
+      <h2>The Line From Your Game</h2>
+      <pre><code>{stats.map((stat) =&gt; (
+  &lt;StatCard key={stat.id} stat={stat} /&gt;
+))}</code></pre>
+      <p>
+        Read that as: “For each stat object, render one <code>StatCard</code>, and hand that stat object to it
+        using a prop named <code>stat</code>.”
+      </p>
+
+      <pre><code>function StatCard({ stat }) {
+  return &lt;h3&gt;{stat.name}&lt;/h3&gt;;
+}</code></pre>
+      <p>
+        Inside <code>StatCard</code>, <code>stat</code> is now available like a local variable.
+      </p>
+
+      <section class="task">
+        <h2>Practice</h2>
+        <p>
+          Open <code>src/App.tsx</code> and find <code>StatusChip</code>. Then find the three places where
+          <code>StatusChip</code> is used. Point at the exact prop names being passed.
+        </p>
+      </section>
+
+      <section class="quiz">
+        <h2>Quick Check</h2>
+        <p data-prompt>
+          In <code>&lt;StatusChip label="Coins" value="140" /&gt;</code>, what are <code>label</code> and
+          <code>value</code>?
+        </p>
+        <button data-answer="Two props" onclick="teachQuiz.answer(this, 'what-are-label-value', 'Two props', 'props-basic-definition', 'props-versus-values')">
+          Two props
+        </button>
+        <button data-answer="Two files" onclick="teachQuiz.answer(this, 'what-are-label-value', 'Two props', 'props-basic-definition', 'props-versus-values')">
+          Two files
+        </button>
+        <button data-answer="Two styles" onclick="teachQuiz.answer(this, 'what-are-label-value', 'Two props', 'props-basic-definition', 'props-versus-values')">
+          Two styles
+        </button>
+        <p class="feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="task">
+        <h2>Explain It Back</h2>
+        <p>
+          In your own words: why can the same <code>StatusChip</code> component show Coins, Streak, and Best?
+        </p>
+        <textarea onblur="teachQuiz.saveResponse(this, 'explain-status-chip-props', 'props-enable-reuse')"></textarea>
+      </section>
+
+      <h2>Go Deeper</h2>
+      <ol>
+        <li>What would <code>StatusChip</code> display if the parent passed <code>label="XP"</code>?</li>
+        <li>Why is a prop more flexible than hardcoding the word <code>Coins</code> inside <code>StatusChip</code>?</li>
+      </ol>
+
+      <h2>Reference</h2>
+      <p>
+        Keep this nearby:
+        <a href="../reference/props.html">Props Reference</a>.
+      </p>
+
+      <section class="teacher-context">
+        <h2>Teacher Context</h2>
+        <p>
+          After you answer, this box gives you a summary you can paste back into chat.
+        </p>
+        <textarea data-teacher-context readonly></textarea>
+      </section>
+
+      <p class="muted">
+        Ask me about any syntax that feels weird. The goal is not to memorize the line; it is to see the data handoff.
+      </p>
+    </main>
+  </body>
+</html>

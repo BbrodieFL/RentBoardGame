@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 0001: Components, Props, and Config</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <script src="../assets/quiz.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">React Game Development - Lesson 0001</p>
+        <h1>Components, Props, and Config</h1>
+        <p>
+          Your first win: trace how one stat in <code>src/gameConfig.ts</code> becomes one stat card
+          on the game screen.
+        </p>
+      </header>
+
+      <h2>The Idea</h2>
+      <p>
+        React UI is built from components: small functions that return JSX. The official React docs describe
+        components as pieces of UI with their own logic and appearance. In this project, <code>App</code> is the
+        screen, while <code>StatCard</code>, <code>ActivityButton</code>, and <code>ProgressBar</code> are smaller
+        pieces inside it.
+      </p>
+      <p>
+        Primary source: <a href="https://react.dev/learn" target="_blank" rel="noreferrer">React Quick Start</a>.
+        For lists specifically, keep
+        <a href="https://react.dev/learn/describing-the-ui#rendering-lists" target="_blank" rel="noreferrer">
+          React: Rendering Lists
+        </a>
+        nearby.
+      </p>
+
+      <h2>The Path Through Your Code</h2>
+      <pre><code>src/gameConfig.ts
+  exports stats
+
+src/App.tsx
+  imports stats
+  maps stats into StatCard components
+  passes each stat as a prop
+
+StatCard
+  reads stat.name, stat.color, stat.totalXp
+  renders one visible stat card</code></pre>
+
+      <h2>Read This Tiny Slice</h2>
+      <pre><code>{stats.map((stat) =&gt; (
+  &lt;StatCard key={stat.id} stat={stat} /&gt;
+))}</code></pre>
+      <p>
+        <code>map</code> means "turn each data item into a UI item." The <code>key</code> helps React track which
+        item is which. The <code>stat={stat}</code> part is a prop: it hands one config object to one child
+        component.
+      </p>
+
+      <section class="task">
+        <h2>Practice</h2>
+        <p>
+          Open <code>src/gameConfig.ts</code>. Change the <code>reading</code> stat's <code>name</code> from
+          <code>Reading</code> to <code>Deep Reading</code>. Save the file and watch the browser update.
+        </p>
+        <p class="muted">
+          Notice that you did not edit <code>StatCard</code>. That is the point of config-driven UI.
+        </p>
+      </section>
+
+      <section class="quiz">
+        <h2>Quick Check</h2>
+        <p data-prompt>
+          In this milestone, where should you change the label for a stat card?
+        </p>
+        <button data-answer="Config file" onclick="teachQuiz.answer(this, 'components-props-config', 'Config file', 'config-driven-ui', 'confused-data-with-markup')">
+          Config file
+        </button>
+        <button data-answer="CSS rules" onclick="teachQuiz.answer(this, 'components-props-config', 'Config file', 'config-driven-ui', 'confused-data-with-markup')">
+          CSS rules
+        </button>
+        <button data-answer="Build output" onclick="teachQuiz.answer(this, 'components-props-config', 'Config file', 'config-driven-ui', 'confused-data-with-markup')">
+          Build output
+        </button>
+        <p class="feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="task">
+        <h2>Explain It Back</h2>
+        <p>
+          In one or two sentences, explain how <code>stats</code> becomes visible stat cards.
+        </p>
+        <textarea onblur="teachQuiz.saveResponse(this, 'explain-app-flow', 'component-data-flow')"></textarea>
+      </section>
+
+      <h2>Go Deeper</h2>
+      <ol>
+        <li>Why does each stat need an <code>id</code> instead of only a display name?</li>
+        <li>What would break if <code>StatCard</code> reached into <code>gameConfig.ts</code> directly instead of receiving a prop?</li>
+      </ol>
+
+      <h2>Reference</h2>
+      <p>
+        Keep this open later:
+        <a href="../reference/component-data-flow.html">Component Data Flow Reference</a>.
+      </p>
+
+      <section class="teacher-context">
+        <h2>Teacher Context</h2>
+        <p>
+          After you answer the quiz or explanation prompt, this box stores a summary you can paste back into chat
+          if you want me to calibrate the next lesson.
+        </p>
+        <textarea data-teacher-context readonly></textarea>
+      </section>
+
+      <p class="muted">
+        Ask the agent followup questions about any line that feels slippery. That is part of the lesson, not a detour.
+      </p>
+    </main>
+  </body>
+</html>

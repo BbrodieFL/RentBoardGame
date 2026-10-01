@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: State and Events</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>State and Events</h1>
+      </header>
+
+      <h2>The Loop</h2>
+      <pre><code>user clicks
+  -> event handler runs
+  -> setter changes state
+  -> React renders again
+  -> screen shows new values</code></pre>
+
+      <h2>In This Game</h2>
+      <pre><code>&lt;button onClick={() =&gt; onLog(activity)}&gt;
+
+function handleActivityLog(activity) {
+  setActivityEntries((entries) =&gt; [entry, ...entries]);
+}</code></pre>
+
+      <h2>State vs Derived Values</h2>
+      <ul>
+        <li>Store the activity entries because the user creates them.</li>
+        <li>Derive rent points by adding up entries.</li>
+        <li>Derive stat XP by starting with config XP and adding entry XP.</li>
+        <li>Remove an entry with <code>filter</code> to undo it.</li>
+      </ul>
+
+      <p>
+        Primary sources:
+        <a href="https://react.dev/learn/state-a-components-memory" target="_blank" rel="noreferrer">React State</a>,
+        <a href="https://react.dev/learn/responding-to-events" target="_blank" rel="noreferrer">React Events</a>, and
+        <a href="https://react.dev/learn/updating-arrays-in-state" target="_blank" rel="noreferrer">Updating Arrays</a>.
+      </p>
+    </main>
+  </body>
+</html>

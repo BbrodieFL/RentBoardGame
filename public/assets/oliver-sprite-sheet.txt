@@ -1,0 +1,9 @@
+idleDown: row 0, frames 4, frame 160x220
+walkDown: row 1, frames 4, frame 160x220
+walkLeft: row 2, frames 4, frame 160x220
+walkRight: row 3, frames 4, frame 160x220
+walkUp: row 4, frames 4, frame 160x220
+coding: row 5, frames 4, frame 160x220
+running: row 6, frames 4, frame 160x220
+reading: row 7, frames 4, frame 160x220
+celebrate: row 8, frames 4, frame 160x220

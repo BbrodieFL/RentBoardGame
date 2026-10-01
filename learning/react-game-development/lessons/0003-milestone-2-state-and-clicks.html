@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 0003: Milestone 2 State and Clicks</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <script src="../assets/quiz.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">React Game Development - Lesson 0003</p>
+        <h1>Milestone 2: State and Clicks</h1>
+        <p>
+          This lesson is mostly about what we added in Milestone 2. The new concepts are the small React tools that
+          make those additions possible.
+        </p>
+      </header>
+
+      <h2>What Changed From Milestone 1?</h2>
+      <p>
+        In Milestone 1, the screen was a poster: React rendered fixed data. In Milestone 2, the screen became a toy:
+        clicking an activity changes what React remembers, and the screen updates from that memory.
+      </p>
+
+      <h2>The New Loop</h2>
+      <pre><code>Click "Code for 30 minutes"
+  -> ActivityButton runs onClick
+  -> App runs handleActivityLog(activity)
+  -> App adds a new ActivityEntry to state
+  -> React renders App again
+  -> rent, XP, animation, and log now look different</code></pre>
+
+      <p>
+        Primary sources:
+        <a href="https://react.dev/learn/responding-to-events" target="_blank" rel="noreferrer">React: Responding to Events</a>
+        and
+        <a href="https://react.dev/learn/state-a-components-memory" target="_blank" rel="noreferrer">React: State - A Component's Memory</a>.
+      </p>
+
+      <h2>The Important State</h2>
+      <pre><code>const [activityEntries, setActivityEntries] = useState&lt;ActivityEntry[]&gt;([]);
+const [activeAnimation, setActiveAnimation] = useState&lt;SpriteAnimationId&gt;(characterDefaultAnimation);
+const [floatingFeedback, setFloatingFeedback] = useState&lt;FloatingFeedback | null&gt;(null);</code></pre>
+
+      <p>
+        Read each line as: “React, please remember this value for me.” The first value is the current state.
+        The second value is the setter function you call when the state should change.
+      </p>
+
+      <h2>Props Still Matter</h2>
+      <pre><code>&lt;ActivityButton
+  activity={activity}
+  onLog={handleActivityLog}
+/&gt;</code></pre>
+
+      <p>
+        This is props again. <code>App</code> passes data with <code>activity</code> and passes a function with
+        <code>onLog</code>. That lets the child button say “I was clicked” without owning the whole game state.
+      </p>
+
+      <h2>Stored vs Derived</h2>
+      <p>
+        We store <code>activityEntries</code> because the user creates those entries. But we do not store
+        <code>todayRentPoints</code>; we calculate it from the entries:
+      </p>
+
+      <pre><code>const todayRentPoints = activityEntries.reduce(
+  (total, entry) =&gt; total + entry.rentPoints,
+  0,
+);</code></pre>
+
+      <p>
+        That means undo is simpler. Remove an entry, and the rent total naturally becomes smaller the next time
+        React renders.
+      </p>
+
+      <section class="task">
+        <h2>Practice In The App</h2>
+        <p>
+          Open <code>src/App.tsx</code>. Find <code>handleActivityLog</code>. Then click an activity in the browser
+          and point to the exact state setter that makes the activity log grow.
+        </p>
+      </section>
+
+      <section class="quiz">
+        <h2>Quick Check</h2>
+        <p data-prompt>
+          Which state value stores the activities you clicked today?
+        </p>
+        <button data-answer="activityEntries" onclick="teachQuiz.answer(this, 'milestone-2-activity-state', 'activityEntries', 'state-stores-user-created-data', 'state-versus-derived-value')">
+          activityEntries
+        </button>
+        <button data-answer="todayRentPoints" onclick="teachQuiz.answer(this, 'milestone-2-activity-state', 'activityEntries', 'state-stores-user-created-data', 'state-versus-derived-value')">
+          todayRentPoints
+        </button>
+        <button data-answer="dailyRentTarget" onclick="teachQuiz.answer(this, 'milestone-2-activity-state', 'activityEntries', 'state-stores-user-created-data', 'state-versus-derived-value')">
+          dailyRentTarget
+        </button>
+        <p class="feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="task">
+        <h2>Explain It Back</h2>
+        <p>
+          In one or two sentences: when you click an activity, why does the rent meter change?
+        </p>
+        <textarea onblur="teachQuiz.saveResponse(this, 'explain-click-to-rent-meter', 'event-state-render-loop')"></textarea>
+      </section>
+
+      <h2>Go Deeper</h2>
+      <ol>
+        <li>Why is <code>todayRentPoints</code> calculated instead of stored as its own state value?</li>
+        <li>Why does undo use <code>filter</code> instead of changing the old array directly?</li>
+      </ol>
+
+      <h2>Reference</h2>
+      <p>
+        Keep this nearby:
+        <a href="../reference/state-event-loop.html">State and Events Reference</a>.
+      </p>
+
+      <section class="teacher-context">
+        <h2>Teacher Context</h2>
+        <p>
+          After you answer, this box gives you a summary you can paste back into chat.
+        </p>
+        <textarea data-teacher-context readonly></textarea>
+      </section>
+
+      <p class="muted">
+        Ask me followup questions about any line that feels too dense. For this lesson, “I can point to the setter”
+        counts as real progress.
+      </p>
+    </main>
+  </body>
+</html>

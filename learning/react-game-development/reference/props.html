@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: Props</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>Props</h1>
+      </header>
+
+      <h2>One-Sentence Definition</h2>
+      <p>
+        A prop is data a parent component hands to a child component, like an argument passed into a function.
+      </p>
+
+      <h2>Shape</h2>
+      <pre><code>&lt;ChildComponent propName={someValue} /&gt;
+
+function ChildComponent({ propName }) {
+  return &lt;p&gt;{propName}&lt;/p&gt;;
+}</code></pre>
+
+      <h2>In This Game</h2>
+      <pre><code>&lt;StatCard stat={stat} /&gt;
+
+function StatCard({ stat }) {
+  return &lt;h3&gt;{stat.name}&lt;/h3&gt;;
+}</code></pre>
+
+      <h2>Rules Of Thumb</h2>
+      <ul>
+        <li>The parent chooses what value to pass.</li>
+        <li>The child reads the value from its props.</li>
+        <li>The child should not change its props.</li>
+        <li>Props make one component reusable with different data.</li>
+      </ul>
+
+      <p>
+        Primary source:
+        <a href="https://react.dev/learn/passing-props-to-a-component" target="_blank" rel="noreferrer">
+          React: Passing Props to a Component
+        </a>.
+      </p>
+    </main>
+  </body>
+</html>

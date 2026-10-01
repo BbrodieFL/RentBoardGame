@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 0004: How Browser Storage Is Used</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <script src="../assets/quiz.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">React Game Development - Lesson 0004</p>
+        <h1>How Browser Storage Is Used</h1>
+        <p>
+          Your win for this lesson: explain why activities survive a refresh even though React state normally resets.
+        </p>
+      </header>
+
+      <h2>Do We Need This Lesson?</h2>
+      <p>
+        Yes, a short one. Milestone 3 added one important concept: browser persistence. React state remembers things
+        while the app is running. <code>localStorage</code> remembers strings for the same browser origin across page
+        loads.
+      </p>
+
+      <p>
+        Primary source:
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API" target="_blank" rel="noreferrer">
+          MDN: Web Storage API
+        </a>.
+      </p>
+
+      <h2>The Save Bucket</h2>
+      <p>
+        The browser gives each origin its own storage bucket. This matters because the port is part of the origin:
+      </p>
+
+      <pre><code>http://127.0.0.1:5173  // one localStorage bucket
+http://127.0.0.1:5174  // a different localStorage bucket</code></pre>
+
+      <h2>The Project Save Key</h2>
+      <pre><code>export const gameSaveKey = 'oliver-tyrone-rpg-save';</code></pre>
+      <p>
+        Think of this as the drawer label inside the browser storage bucket. Our game always saves and loads using
+        this same key.
+      </p>
+
+      <h2>Why We Use JSON</h2>
+      <p>
+        The Web Storage API stores keys and values as strings. Our game save is an object, so we serialize it before
+        saving:
+      </p>
+
+      <pre><code>storage.setItem(gameSaveKey, JSON.stringify(save));</code></pre>
+
+      <p>Then we deserialize it when loading:</p>
+
+      <pre><code>const rawSave = storage.getItem(gameSaveKey);
+const parsedSave = JSON.parse(rawSave);</code></pre>
+
+      <p>
+        Sources:
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API" target="_blank" rel="noreferrer">
+          MDN: Using Web Storage
+        </a>,
+        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" target="_blank" rel="noreferrer">
+          JSON.stringify
+        </a>, and
+        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" target="_blank" rel="noreferrer">
+          JSON.parse
+        </a>.
+      </p>
+
+      <h2>The App Flow</h2>
+      <pre><code>const [activityEntries, setActivityEntries] =
+  useState(() =&gt; loadGameSave().activityEntries);</code></pre>
+
+      <p>
+        This loads saved activities only when React creates the state for the first time.
+      </p>
+
+      <pre><code>useEffect(() =&gt; {
+  saveGameSave({
+    schemaVersion: 1,
+    activityEntries,
+  });
+}, [activityEntries]);</code></pre>
+
+      <p>
+        This saves whenever <code>activityEntries</code> changes. Log an activity: save. Undo an activity: save.
+      </p>
+
+      <section class="task">
+        <h2>Practice In The Browser</h2>
+        <p>
+          Open DevTools, go to Application, then Local Storage. Look for the key
+          <code>oliver-tyrone-rpg-save</code>. Log an activity and watch the value change.
+        </p>
+      </section>
+
+      <section class="quiz">
+        <h2>Quick Check</h2>
+        <p data-prompt>
+          Why do we call <code>JSON.stringify</code> before saving?
+        </p>
+        <button data-answer="Storage wants strings" onclick="teachQuiz.answer(this, 'why-json-stringify-storage', 'Storage wants strings', 'serialization-for-localstorage', 'object-versus-string-storage')">
+          Storage wants strings
+        </button>
+        <button data-answer="React wants styles" onclick="teachQuiz.answer(this, 'why-json-stringify-storage', 'Storage wants strings', 'serialization-for-localstorage', 'object-versus-string-storage')">
+          React wants styles
+        </button>
+        <button data-answer="Vite wants routes" onclick="teachQuiz.answer(this, 'why-json-stringify-storage', 'Storage wants strings', 'serialization-for-localstorage', 'object-versus-string-storage')">
+          Vite wants routes
+        </button>
+        <p class="feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="task">
+        <h2>Explain It Back</h2>
+        <p>
+          In one or two sentences: how does one logged activity survive a page refresh?
+        </p>
+        <textarea onblur="teachQuiz.saveResponse(this, 'explain-localstorage-refresh', 'browser-persistence-loop')"></textarea>
+      </section>
+
+      <h2>Go Deeper</h2>
+      <ol>
+        <li>Why might the save seem to disappear if Vite restarts on a different port?</li>
+        <li>Why do we validate loaded save data before trusting it?</li>
+      </ol>
+
+      <h2>Reference</h2>
+      <p>
+        Keep this nearby:
+        <a href="../reference/local-storage-save-loop.html">localStorage Save Loop Reference</a>.
+      </p>
+
+      <section class="teacher-context">
+        <h2>Teacher Context</h2>
+        <p>
+          After you answer, this box gives you a summary you can paste back into chat.
+        </p>
+        <textarea data-teacher-context readonly></textarea>
+      </section>
+
+      <p class="muted">
+        Ask me followup questions about the browser Application tab or any line in <code>storage.ts</code>.
+      </p>
+    </main>
+  </body>
+</html>

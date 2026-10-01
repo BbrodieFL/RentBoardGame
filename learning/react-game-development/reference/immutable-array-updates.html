@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: Immutable Array Updates</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>Immutable Array Updates</h1>
+      </header>
+
+      <h2>The Rule</h2>
+      <p>
+        When an array is stored in React state, make a new array for each change. Do not edit the old state array in
+        place.
+      </p>
+
+      <h2>Add One Item</h2>
+      <pre><code>setActivityEntries((entries) =&gt; [newEntry, ...entries]);</code></pre>
+      <p>
+        This creates a fresh array whose first item is <code>newEntry</code>, followed by everything that was already
+        in <code>entries</code>.
+      </p>
+
+      <h2>Remove One Item</h2>
+      <pre><code>setActivityEntries((entries) =&gt;
+  entries.filter((entry) =&gt; entry.id !== entryId)
+);</code></pre>
+      <p>
+        <code>filter</code> creates a fresh array containing only the entries that pass the test.
+      </p>
+
+      <h2>In This Game</h2>
+      <ul>
+        <li>Log activity: create a new array with one extra entry.</li>
+        <li>Undo activity: create a new array missing one entry.</li>
+        <li>Rent points and stat XP update because they are derived from the new array.</li>
+      </ul>
+
+      <p>
+        Primary source:
+        <a href="https://react.dev/learn/updating-arrays-in-state" target="_blank" rel="noreferrer">
+          React: Updating Arrays in State
+        </a>.
+      </p>
+    </main>
+  </body>
+</html>

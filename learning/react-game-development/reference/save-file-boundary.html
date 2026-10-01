@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: Save File Boundary</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>Save File Boundary</h1>
+      </header>
+
+      <h2>The Pattern</h2>
+      <pre><code>gameSave object
+  -> JSON.stringify(...)
+  -> exported .json file
+
+imported .json file
+  -> JSON.parse(...)
+  -> normalizeGameSave(...)
+  -> gameSave object</code></pre>
+
+      <h2>Three Actions</h2>
+      <ul>
+        <li><code>handleExportSave</code>: downloads the current save as JSON text.</li>
+        <li><code>handleImportSave</code>: reads a JSON file, parses it, and normalizes it.</li>
+        <li><code>handleResetSave</code>: asks for confirmation, then restores the default save.</li>
+      </ul>
+
+      <h2>Why Normalize?</h2>
+      <p>
+        Imported files are outside the app's control. Normalization keeps valid pieces, drops malformed entries, and
+        fills in defaults for missing fields.
+      </p>
+
+      <h2>Project Files</h2>
+      <ul>
+        <li><code>src/App.tsx</code>: export, import, and reset event handlers.</li>
+        <li><code>src/storage.ts</code>: save shape, defaults, validation, and migration.</li>
+        <li><code>src/storage.test.ts</code>: tests for loading, migration, and malformed data.</li>
+      </ul>
+    </main>
+  </body>
+</html>

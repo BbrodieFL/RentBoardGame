@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local game save exports
+GameSaves/
+
+# Local planning/spec notes
+EngineeringQuests.MD
+ProjectRequirments.MD
+ProjectRules.MD
+
+# Local learning progress data
+learning/**/quiz-attempts.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs and tool caches
+*.log
+.vite/
+coverage/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 0007: Save File Boundary</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <script src="../assets/quiz.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">React Game Development - Lesson 0007</p>
+        <h1>Save File Boundary</h1>
+        <p>
+          Your win for this lesson: explain why import/export uses the same save object as localStorage.
+        </p>
+      </header>
+
+      <h2>Do We Need This Lesson?</h2>
+      <p>
+        Yes, but only a small one. The shop mechanic was removed because it cluttered the game. The useful Milestone 5
+        idea that remains is the save-file boundary: turn <code>gameSave</code> into JSON text when exporting, then
+        turn JSON text back into validated save data when importing.
+      </p>
+
+      <p>
+        Primary sources:
+        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" target="_blank" rel="noreferrer">
+          MDN: JSON.stringify
+        </a>
+        and
+        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" target="_blank" rel="noreferrer">
+          MDN: JSON.parse
+        </a>.
+      </p>
+
+      <h2>Export: Object To Text File</h2>
+      <pre><code>const exportText = JSON.stringify(gameSave, null, 2);</code></pre>
+
+      <p>
+        Export does not invent a second save system. It takes the current <code>gameSave</code> object and serializes it
+        into readable JSON text.
+      </p>
+
+      <h2>Import: Text File To Safe Save</h2>
+      <pre><code>const importedValue = JSON.parse(contents);
+setGameSave(normalizeGameSave(importedValue));</code></pre>
+
+      <p>
+        Import treats the file as untrusted. The file might be old, broken, or hand-edited, so the app runs it through
+        <code>normalizeGameSave</code> before using it.
+      </p>
+
+      <h2>Reset: Back To Defaults</h2>
+      <pre><code>setGameSave(createDefaultSave());</code></pre>
+
+      <p>
+        Reset uses the same default save shape as a brand-new browser. The confirmation prompt protects against
+        accidental deletion.
+      </p>
+
+      <section class="task">
+        <h2>Practice In The Code</h2>
+        <p>
+          Open <code>src/App.tsx</code> and find <code>handleExportSave</code>, <code>handleImportSave</code>, and
+          <code>handleResetSave</code>. Then open <code>src/storage.ts</code> and find
+          <code>normalizeGameSave</code>.
+        </p>
+      </section>
+
+      <section class="quiz">
+        <h2>Quick Check</h2>
+        <p data-prompt>
+          Why does import call <code>normalizeGameSave</code>?
+        </p>
+        <button data-answer="Validate save data" onclick="teachQuiz.answer(this, 'why-normalize-import', 'Validate save data', 'save-file-boundary', 'trusting-imported-json')">
+          Validate save data
+        </button>
+        <button data-answer="Animate sprite row" onclick="teachQuiz.answer(this, 'why-normalize-import', 'Validate save data', 'save-file-boundary', 'trusting-imported-json')">
+          Animate sprite row
+        </button>
+        <button data-answer="Style save panel" onclick="teachQuiz.answer(this, 'why-normalize-import', 'Validate save data', 'save-file-boundary', 'trusting-imported-json')">
+          Style save panel
+        </button>
+        <p class="feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="task">
+        <h2>Explain It Back</h2>
+        <p>
+          In one or two sentences: how are localStorage saves and exported JSON files related?
+        </p>
+        <textarea onblur="teachQuiz.saveResponse(this, 'explain-save-json-boundary', 'shared-save-shape')"></textarea>
+      </section>
+
+      <h2>Go Deeper</h2>
+      <ol>
+        <li>Why might an older exported save still load after the app's save schema changes?</li>
+        <li>Why is reset implemented through state instead of directly editing the page?</li>
+      </ol>
+
+      <h2>Reference</h2>
+      <p>
+        Keep this nearby:
+        <a href="../reference/save-file-boundary.html">Save File Boundary Reference</a>.
+      </p>
+
+      <section class="teacher-context">
+        <h2>Teacher Context</h2>
+        <p>
+          After you answer, this box gives you a summary you can paste back into chat.
+        </p>
+        <textarea data-teacher-context readonly></textarea>
+      </section>
+
+      <p class="muted">
+        Ask me followup questions about JSON files, save migration, or why imported data should be validated.
+      </p>
+    </main>
+  </body>
+</html>

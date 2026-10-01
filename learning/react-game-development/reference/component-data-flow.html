@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: Component Data Flow</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>Component Data Flow</h1>
+      </header>
+
+      <h2>Core Pattern</h2>
+      <pre><code>config data -> parent component -> props -> child component -> JSX</code></pre>
+
+      <h2>In This Project</h2>
+      <p>
+        <code>src/gameConfig.ts</code> exports arrays like <code>stats</code> and
+        <code>quickActivities</code>. <code>src/App.tsx</code> imports those arrays,
+        maps over them, and passes each item into a smaller component as a prop.
+      </p>
+
+      <h2>Questions To Ask</h2>
+      <ul>
+        <li>Is this value project data? Put it in config.</li>
+        <li>Is this value calculated from other data? Derive it.</li>
+        <li>Is this repeated UI? Map over an array and render a component.</li>
+        <li>Does a child need data? Pass a prop.</li>
+      </ul>
+    </main>
+  </body>
+</html>

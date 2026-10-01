@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: Game Rule Functions</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>Game Rule Functions</h1>
+      </header>
+
+      <h2>The Pattern</h2>
+      <pre><code>saved data
+  -> pure rule function
+  -> answer
+  -> React state update
+  -> UI renders from new state</code></pre>
+
+      <h2>Current Rule Functions</h2>
+      <ul>
+        <li><code>getRentPointsForDate(entries, date)</code>: adds rent points for one day.</li>
+        <li><code>isRentPaidForDate(entries, date)</code>: checks whether that day reached the target.</li>
+        <li><code>recordRentPaidOnce(results, date, paidAt)</code>: adds one paid-day result if missing.</li>
+        <li><code>removeRentPaidForDate(results, date)</code>: removes a paid-day result after a correction.</li>
+        <li><code>getCurrentStreak(results, today)</code>: counts the live current streak.</li>
+        <li><code>getBestStreak(results)</code>: finds the longest historical streak.</li>
+      </ul>
+
+      <h2>Why This Helps</h2>
+      <p>
+        These functions do not render UI and do not touch <code>localStorage</code>. That makes them easier to read,
+        test, and fix when a game rule feels wrong.
+      </p>
+
+      <p>
+        Related source:
+        <a href="https://react.dev/learn/updating-objects-in-state" target="_blank" rel="noreferrer">
+          React: Updating Objects in State
+        </a>.
+      </p>
+    </main>
+  </body>
+</html>

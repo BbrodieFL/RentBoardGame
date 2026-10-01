@@ -1,0 +1,115 @@
+:root {
+  color: #17151f;
+  background: #f7f3e8;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  width: min(880px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+header {
+  border-bottom: 2px solid #17151f;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #775c00;
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1;
+}
+
+h2 {
+  border-top: 1px solid #c8be9e;
+  margin-top: 32px;
+  padding-top: 18px;
+}
+
+a {
+  color: #064f8f;
+}
+
+code,
+pre {
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+}
+
+pre {
+  overflow-x: auto;
+  border-left: 4px solid #17151f;
+  background: #fffaf0;
+  padding: 14px 16px;
+}
+
+.task,
+.quiz,
+.teacher-context {
+  border: 1px solid #c8be9e;
+  background: #fffaf0;
+  margin: 18px 0;
+  padding: 18px;
+}
+
+.quiz button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  border: 1px solid #17151f;
+  background: #f7f3e8;
+  padding: 10px 12px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.quiz button:hover,
+.quiz button:focus-visible {
+  outline: 2px solid #775c00;
+  outline-offset: 2px;
+}
+
+.feedback {
+  min-height: 1.4em;
+  margin: 10px 0 0;
+  font-weight: 700;
+}
+
+textarea {
+  width: 100%;
+  min-height: 110px;
+  border: 1px solid #17151f;
+  padding: 10px;
+  font: inherit;
+}
+
+.muted {
+  color: #5f5b51;
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference: localStorage Save Loop</title>
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Reference</p>
+        <h1>localStorage Save Loop</h1>
+      </header>
+
+      <h2>The Loop</h2>
+      <pre><code>Browser localStorage
+  -> loadGameSave()
+  -> React useState initial value
+  -> UI renders saved activities
+
+User logs or undoes activity
+  -> React state changes
+  -> useEffect runs
+  -> saveGameSave()
+  -> Browser localStorage</code></pre>
+
+      <h2>Why JSON?</h2>
+      <p>
+        Browser storage values are strings. Our save is an object, so we turn it into a string with
+        <code>JSON.stringify</code> before saving, then turn it back into an object with <code>JSON.parse</code>
+        when loading.
+      </p>
+
+      <h2>Origin Rule</h2>
+      <p>
+        <code>http://127.0.0.1:5173</code> and <code>http://127.0.0.1:5174</code> are different origins because
+        the port is different. Different origins get different localStorage buckets.
+      </p>
+
+      <h2>Project Files</h2>
+      <ul>
+        <li><code>src/storage.ts</code>: reads, writes, validates, and clears saved data.</li>
+        <li><code>src/gameTypes.ts</code>: shared data shape for saved activity entries.</li>
+        <li><code>src/App.tsx</code>: loads save data into state and saves state changes.</li>
+      </ul>
+    </main>
+  </body>
+</html>
