@@ -16,6 +16,7 @@ import {
   undoActivity,
   useRestToken,
 } from './gameActions';
+import { shouldOpenRentReflection } from './appUi';
 import { getCurrentStreak } from './gameMath';
 import { createDefaultSave, type GameSave } from './storage';
 
@@ -71,6 +72,19 @@ describe('game actions', () => {
     expect(paidResult.feedback?.text).toBe(`RENT PAID +${dailyRentCoinReward} coins`);
     expect(extraResult.save.coinBalance).toBe(dailyRentCoinReward);
     expect(extraResult.feedback?.text).toBe('+25 XP');
+  });
+
+  it('opens the rent reflection only when rent is newly paid', () => {
+    let save = createDefaultSave();
+
+    save = logActivity(save, codeActivity, 0.5, new Date('2026-09-14T09:00:00'), '2026-09-14').save;
+    save = logActivity(save, codeActivity, 0.5, new Date('2026-09-14T10:00:00'), '2026-09-14').save;
+
+    const paidResult = logActivity(save, codeActivity, 0.5, new Date('2026-09-14T11:00:00'), '2026-09-14');
+    const extraResult = logActivity(paidResult.save, codeActivity, 0.5, new Date('2026-09-14T12:00:00'), '2026-09-14');
+
+    expect(shouldOpenRentReflection(paidResult.feedback)).toBe(true);
+    expect(shouldOpenRentReflection(extraResult.feedback)).toBe(false);
   });
 
   it('does not award rent coins above the coin cap', () => {

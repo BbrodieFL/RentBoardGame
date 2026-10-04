@@ -950,6 +950,97 @@ h3 {
   font-weight: 900;
 }
 
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(18, 15, 34, 0.76);
+}
+
+.rentReflectionModal {
+  width: min(500px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 228, 92, 0.14), transparent 42%),
+    #201a3d;
+}
+
+.rentReflectionModal h2 {
+  color: #ffe45c;
+  font-size: clamp(1.35rem, 5vw, 2rem);
+  text-shadow: 3px 3px 0 #000000;
+}
+
+.reflectionCopy {
+  margin-top: 14px;
+  color: #f8f7ff;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.reflectionField {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  color: #c3c6ff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.reflectionField textarea {
+  width: 100%;
+  resize: vertical;
+  border: 3px solid #403574;
+  background: #120f22;
+  color: #f8f7ff;
+  padding: 10px;
+  font: inherit;
+  font-weight: 900;
+}
+
+.reflectionField textarea::placeholder {
+  color: #777dbd;
+}
+
+.reflectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.reflectionActions button {
+  min-height: 44px;
+  border: 3px solid #f8f7ff;
+  padding: 9px 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #000000;
+  cursor: pointer;
+}
+
+.reflectionPrimaryButton {
+  background: #58ff78;
+  color: #120f22;
+}
+
+.reflectionSecondaryButton {
+  background: #120f22;
+  color: #f8f7ff;
+}
+
+.reflectionField textarea:focus-visible,
+.reflectionActions button:focus-visible {
+  outline: 3px solid #ffe45c;
+  outline-offset: 2px;
+}
+
 @media (max-width: 880px) {
   .topBar,
   .gameGrid,

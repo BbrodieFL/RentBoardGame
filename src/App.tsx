@@ -22,6 +22,7 @@ import {
   useRestToken,
   type GameActionFeedback,
 } from './gameActions';
+import { shouldOpenRentReflection } from './appUi';
 import {
   getBestStreak,
   getCurrentStreak,
@@ -41,6 +42,13 @@ type FloatingFeedback = {
   text: string;
 };
 
+type RentReflection = {
+  id: string;
+  activityLabel: string;
+  rentPoints: number;
+  xp: number;
+};
+
 const questDeadline = new Date('2026-10-31T23:59:59');
 const activityDurationPresets = [5, 15, 30, 45, 60];
 const minimumActivityMinutes = 5;
@@ -51,6 +59,7 @@ function App() {
   const [gameSave, setGameSave] = useState(() => loadGameSave());
   const [activeAnimation, setActiveAnimation] = useState<SpriteAnimationId>(characterDefaultAnimation);
   const [floatingFeedback, setFloatingFeedback] = useState<FloatingFeedback | null>(null);
+  const [rentReflection, setRentReflection] = useState<RentReflection | null>(null);
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [selectedActivity, setSelectedActivity] = useState<ActivityConfig | null>(null);
   const animationResetTimer = useRef<number | null>(null);
@@ -110,6 +119,19 @@ function App() {
     setGameSave(result.save);
     setSelectedActivity(null);
     showGameFeedback(result.feedback);
+
+    const feedback = result.feedback;
+
+    if (shouldOpenRentReflection(feedback)) {
+      const newestEntry = result.save.activityEntries[0];
+
+      setRentReflection({
+        id: feedback.id,
+        activityLabel: newestEntry.label,
+        rentPoints: newestEntry.rentPoints,
+        xp: newestEntry.xp,
+      });
+    }
   }
 
   function handleUndo(entryId: string) {
@@ -345,6 +367,9 @@ function App() {
           />
         </details>
       </section>
+      {rentReflection ? (
+        <RentReflectionModal reflection={rentReflection} onClose={() => setRentReflection(null)} />
+      ) : null}
     </main>
   );
 }
@@ -457,6 +482,44 @@ function QuestLog({
         <button type="submit">Add</button>
       </form>
     </details>
+  );
+}
+
+function RentReflectionModal({
+  onClose,
+  reflection,
+}: {
+  onClose: () => void;
+  reflection: RentReflection;
+}) {
+  return (
+    <div className="modalBackdrop" role="presentation">
+      <section
+        aria-labelledby="rent-reflection-title"
+        aria-modal="true"
+        className="rentReflectionModal pixelPanel"
+        role="dialog"
+      >
+        <p className="eyebrow">Rent Paid</p>
+        <h2 id="rent-reflection-title">The room feels lighter.</h2>
+        <p className="reflectionCopy">
+          Oliver takes a quiet minute at the desk. Today&apos;s rent was covered by {reflection.activityLabel}, earning +
+          {reflection.xp} XP and +{reflection.rentPoints} rent points.
+        </p>
+        <label className="reflectionField">
+          <span>What helped you show up?</span>
+          <textarea placeholder="A quick note for future Oliver..." rows={4} />
+        </label>
+        <div className="reflectionActions">
+          <button className="reflectionPrimaryButton" type="button" onClick={onClose}>
+            Save Note
+          </button>
+          <button className="reflectionSecondaryButton" type="button" onClick={onClose}>
+            Skip
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 
