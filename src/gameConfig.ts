@@ -62,7 +62,7 @@ export const spriteAnimations: Record<SpriteAnimationId, SpriteAnimationConfig> 
 export const dailyRentTarget = 100;
 export const dailyRentCoinReward = 35;
 export const restTokenCost = dailyRentCoinReward * 3;
-export const maxCoinBalance = restTokenCost;
+export const maxCoinBalance = restTokenCost * 2;
 export const questCompletionCoinReward = restTokenCost;
 export const startingCoinBalance = 0;
 export const baseLevelXp = 100;
