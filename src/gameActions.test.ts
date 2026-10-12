@@ -8,10 +8,13 @@ import {
 } from './gameConfig';
 import {
   addQuest,
+  addSubQuest,
   calculateActivityReward,
   createActivityEntry,
   logActivity,
   removeQuest,
+  removeSubQuest,
+  toggleSubQuestCompletion,
   toggleQuestCompletion,
   undoActivity,
   useRestToken,
@@ -155,6 +158,7 @@ describe('game actions', () => {
     const result = toggleQuestCompletion(save, 'http-server');
 
     expect(result.completedQuestIds).toContain('http-server');
+    expect(result.quests.some((quest) => quest.id === 'http-server')).toBe(true);
     expect(result.coinBalance).toBe(questCompletionCoinReward);
   });
 
@@ -184,16 +188,83 @@ describe('game actions', () => {
     const save = {
       ...createDefaultSave(),
       completedQuestIds: ['http-server'],
+      subQuests: [
+        {
+          id: 'socket-step',
+          questId: 'http-server',
+          title: 'Handle one socket',
+          createdOn: new Date('2026-09-14T08:00:00').getTime(),
+          completeBy: null,
+        },
+      ],
+      completedSubQuestIds: ['socket-step'],
     };
     const result = removeQuest(save, 'http-server');
 
     expect(result.quests.some((quest) => quest.id === 'http-server')).toBe(false);
     expect(result.completedQuestIds).not.toContain('http-server');
+    expect(result.subQuests).toEqual([]);
+    expect(result.completedSubQuestIds).toEqual([]);
   });
 
   it('does not remove unknown quest ids', () => {
     const save = createDefaultSave();
 
     expect(removeQuest(save, 'not-a-real-quest')).toBe(save);
+  });
+
+  it('adds a sub-quest to an existing quest', () => {
+    const save = createDefaultSave();
+    const completeBy = new Date('2026-10-01T12:00:00').getTime();
+    const result = addSubQuest(
+      save,
+      'http-server',
+      '  Parse the request line  ',
+      new Date('2026-09-14T08:00:00'),
+      'sub-quest-1',
+      completeBy,
+    );
+
+    expect(result.subQuests).toEqual([
+      {
+        id: 'sub-quest-1',
+        questId: 'http-server',
+        title: 'Parse the request line',
+        createdOn: new Date('2026-09-14T08:00:00').getTime(),
+        completeBy,
+      },
+    ]);
+  });
+
+  it('does not add a sub-quest for an unknown quest', () => {
+    const save = createDefaultSave();
+
+    expect(addSubQuest(save, 'not-a-real-quest', 'Step')).toBe(save);
+  });
+
+  it('toggles sub-quest completion', () => {
+    const save = addSubQuest(createDefaultSave(), 'http-server', 'Parse the request line', new Date(), 'sub-quest-1');
+    const completed = toggleSubQuestCompletion(save, 'sub-quest-1');
+    const uncompleted = toggleSubQuestCompletion(completed, 'sub-quest-1');
+
+    expect(completed.completedSubQuestIds).toEqual(['sub-quest-1']);
+    expect(uncompleted.completedSubQuestIds).toEqual([]);
+  });
+
+  it('removes a sub-quest and its completion state', () => {
+    const save = {
+      ...addSubQuest(createDefaultSave(), 'http-server', 'Parse the request line', new Date(), 'sub-quest-1'),
+      completedSubQuestIds: ['sub-quest-1'],
+    };
+    const result = removeSubQuest(save, 'sub-quest-1');
+
+    expect(result.subQuests).toEqual([]);
+    expect(result.completedSubQuestIds).toEqual([]);
+  });
+
+  it('does not remove unknown sub-quest ids', () => {
+    const save = createDefaultSave();
+
+    expect(removeSubQuest(save, 'not-a-real-sub-quest')).toBe(save);
   });
 });

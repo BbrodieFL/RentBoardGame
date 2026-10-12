@@ -44,6 +44,18 @@ Quests are goals the player can complete.
 | xp_reward | XP awarded on completion |
 | stat_id | foreign key to `stats.id` if the quest rewards one stat |
 
+### sub_quests
+
+Sub-quests are smaller steps attached to a main quest.
+
+| column | notes |
+| --- | --- |
+| id | primary key |
+| main_quest_id | foreign key to `quests.id` |
+| title | display name |
+| created_on | when the sub-quest was created |
+| complete_by | optional deadline |
+
 ## Fact Tables
 
 These tables record things that happened.
@@ -130,6 +142,7 @@ Primary keys:
 - `stats.id`
 - `activities.id`
 - `quests.id`
+- `sub_quests.id`
 - `activity_entries.id`
 - `daily_rent_results.id`
 - `daily_reflections.id`
@@ -141,6 +154,7 @@ Foreign keys:
 
 - `activities.stat_id` -> `stats.id`
 - `quests.stat_id` -> `stats.id`
+- `sub_quests.main_quest_id` -> `quests.id`
 - `activity_entries.activity_id` -> `activities.id`
 - `daily_reflections.rent_result_id` -> `daily_rent_results.id`
 - `quest_completions.quest_id` -> `quests.id`

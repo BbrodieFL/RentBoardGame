@@ -31,3 +31,11 @@ export type Quest = {
   createdAt: number;
   deadlineAt: number | null;
 };
+
+export type SubQuest = {
+  id: string;
+  questId: string;
+  title: string;
+  createdOn: number;
+  completeBy: number | null;
+};

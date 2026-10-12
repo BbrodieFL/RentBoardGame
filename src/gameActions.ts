@@ -197,6 +197,10 @@ export function removeQuest(save: GameSave, questId: string): GameSave {
     ...save,
     quests: save.quests.filter((quest) => quest.id !== questId),
     completedQuestIds: save.completedQuestIds.filter((completedQuestId) => completedQuestId !== questId),
+    subQuests: save.subQuests.filter((subQuest) => subQuest.questId !== questId),
+    completedSubQuestIds: save.completedSubQuestIds.filter((completedSubQuestId) =>
+      save.subQuests.some((subQuest) => subQuest.id === completedSubQuestId && subQuest.questId !== questId),
+    ),
   };
 }
 
@@ -227,10 +231,70 @@ export function addQuest(
   };
 }
 
+export function addSubQuest(
+  save: GameSave,
+  questId: string,
+  title: string,
+  now = new Date(),
+  subQuestId = createSubQuestId(now),
+  completeBy: number | null = null,
+): GameSave {
+  const trimmedTitle = title.trim();
+
+  if (!trimmedTitle || !save.quests.some((quest) => quest.id === questId)) {
+    return save;
+  }
+
+  return {
+    ...save,
+    subQuests: [
+      ...save.subQuests,
+      {
+        id: subQuestId,
+        questId,
+        title: trimmedTitle,
+        createdOn: now.getTime(),
+        completeBy,
+      },
+    ],
+  };
+}
+
+export function toggleSubQuestCompletion(save: GameSave, subQuestId: string): GameSave {
+  if (!save.subQuests.some((subQuest) => subQuest.id === subQuestId)) {
+    return save;
+  }
+
+  const isCompleted = save.completedSubQuestIds.includes(subQuestId);
+
+  return {
+    ...save,
+    completedSubQuestIds: isCompleted
+      ? save.completedSubQuestIds.filter((completedSubQuestId) => completedSubQuestId !== subQuestId)
+      : [...save.completedSubQuestIds, subQuestId],
+  };
+}
+
+export function removeSubQuest(save: GameSave, subQuestId: string): GameSave {
+  if (!save.subQuests.some((subQuest) => subQuest.id === subQuestId)) {
+    return save;
+  }
+
+  return {
+    ...save,
+    subQuests: save.subQuests.filter((subQuest) => subQuest.id !== subQuestId),
+    completedSubQuestIds: save.completedSubQuestIds.filter((completedSubQuestId) => completedSubQuestId !== subQuestId),
+  };
+}
+
 function createActivityEntryId(now: Date, activityId: string): string {
   return globalThis.crypto?.randomUUID?.() ?? `${now.getTime()}-${activityId}`;
 }
 
 function createQuestId(now: Date): string {
   return globalThis.crypto?.randomUUID?.() ?? `quest-${now.getTime()}`;
+}
+
+function createSubQuestId(now: Date): string {
+  return globalThis.crypto?.randomUUID?.() ?? `sub-quest-${now.getTime()}`;
 }
