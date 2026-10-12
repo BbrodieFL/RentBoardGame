@@ -700,11 +700,20 @@ h3 {
 }
 
 .questReward {
-  margin-bottom: 14px;
+  margin: 0;
   color: #ffe45c;
   font-size: 0.8rem;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.questToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .questList {
@@ -716,17 +725,28 @@ h3 {
 }
 
 .questList li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
   border: 3px solid #403574;
   background: #151127;
   color: #f8f7ff;
   font-weight: 900;
 }
 
-.questList label {
+.questRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.questRowActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 12px 12px 0;
+}
+
+.questCompleteToggle,
+.subQuestList label {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
   align-items: center;
@@ -735,19 +755,21 @@ h3 {
   cursor: pointer;
 }
 
-.questList input {
+.questCompleteToggle input,
+.subQuestList input[type="checkbox"] {
   width: 24px;
   height: 24px;
   margin: 0;
   accent-color: #58ff78;
 }
 
-.questList input:focus-visible {
+.questCompleteToggle input:focus-visible,
+.subQuestList input[type="checkbox"]:focus-visible {
   outline: 3px solid #ffe45c;
   outline-offset: 3px;
 }
 
-.questList input:checked + span {
+.questCompleteToggle input:checked + span {
   color: #58ff78;
   text-decoration: line-through;
   text-decoration-thickness: 3px;
@@ -765,8 +787,21 @@ h3 {
   text-transform: uppercase;
 }
 
+.questExpandButton {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #ffe45c;
+  background: #120f22;
+  color: #ffe45c;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .questRemoveButton {
-  margin-right: 12px;
   border: 2px solid #ff4f8b;
   background: transparent;
   color: #ff4f8b;
@@ -777,20 +812,75 @@ h3 {
   cursor: pointer;
 }
 
+.questExpandButton:hover,
+.questExpandButton:focus-visible,
 .questRemoveButton:hover,
 .questRemoveButton:focus-visible {
   outline: 2px solid #ffe45c;
   outline-offset: 2px;
 }
 
-.questAddForm {
+.subQuestArea {
+  border-top: 2px solid #403574;
+  padding: 0 12px 12px 42px;
+}
+
+.subQuestList {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.subQuestList li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  border: 2px solid #2b2554;
+  background: #120f22;
+  color: #c3c6ff;
+}
+
+.subQuestList input:checked + span {
+  color: #58ff78;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.subQuestRemoveButton {
+  margin: 10px 10px 10px 0;
+  border: 2px solid #ff4f8b;
+  background: transparent;
+  color: #ff4f8b;
+  padding: 5px 7px;
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.subQuestRemoveButton:hover,
+.subQuestRemoveButton:focus-visible {
+  outline: 2px solid #ffe45c;
+  outline-offset: 2px;
+}
+
+.questAddForm,
+.subQuestAddForm {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 10px;
   margin-top: 12px;
 }
 
-.questAddForm input {
+.subQuestAddForm {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.questAddForm input,
+.subQuestAddForm input {
   min-width: 0;
   border: 3px solid #403574;
   background: #120f22;
@@ -800,11 +890,13 @@ h3 {
   font-weight: 900;
 }
 
-.questAddForm input::placeholder {
+.questAddForm input::placeholder,
+.subQuestAddForm input::placeholder {
   color: #777dbd;
 }
 
-.questAddForm button {
+.questAddForm button,
+.subQuestAddForm button {
   border: 3px solid #f8f7ff;
   background: #58ff78;
   color: #120f22;
@@ -816,7 +908,9 @@ h3 {
 }
 
 .questAddForm input:focus-visible,
-.questAddForm button:focus-visible {
+.questAddForm button:focus-visible,
+.subQuestAddForm input:focus-visible,
+.subQuestAddForm button:focus-visible {
   outline: 3px solid #ffe45c;
   outline-offset: 2px;
 }
@@ -1131,7 +1225,8 @@ h3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .questAddForm {
+  .questAddForm,
+  .subQuestAddForm {
     grid-template-columns: 1fr;
   }
 

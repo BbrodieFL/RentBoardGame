@@ -1,8 +1,8 @@
 import { starterQuests, startingCoinBalance, stats, type StatId } from './gameConfig';
 import { capCoinBalance, getBestStreak, getCurrentStreak } from './gameMath';
-import type { ActivityEntry, DailyRentResult, Quest, RestTokenUse } from './gameTypes';
+import type { ActivityEntry, DailyRentResult, Quest, RestTokenUse, SubQuest } from './gameTypes';
 
-export const currentSchemaVersion = 7;
+export const currentSchemaVersion = 9;
 export const gameSaveKey = 'oliver-tyrone-rpg-save';
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
@@ -17,6 +17,8 @@ export type GameSave = {
   bestStreak: number;
   quests: Quest[];
   completedQuestIds: string[];
+  subQuests: SubQuest[];
+  completedSubQuestIds: string[];
   settings: {
     reduceMotion: boolean;
   };
@@ -35,6 +37,8 @@ export function createDefaultSave(): GameSave {
     bestStreak: 0,
     quests: [...starterQuests],
     completedQuestIds: [],
+    subQuests: [],
+    completedSubQuestIds: [],
     settings: {
       reduceMotion: false,
     },
@@ -90,6 +94,26 @@ export function normalizeGameSave(value: unknown): GameSave {
   const completedQuestIds = Array.isArray(value.completedQuestIds)
     ? [...new Set(value.completedQuestIds.filter((questId) => typeof questId === 'string'))]
     : [];
+  const completedQuestIdSet = new Set(completedQuestIds);
+  const visibleQuests = mergeWithStarterQuests([
+    ...quests,
+    ...normalizeLegacyCompletedQuests(value.completedQuests),
+  ]);
+  const normalizedCompletedQuestIds = [...completedQuestIdSet].filter((questId) =>
+    visibleQuests.some((quest) => quest.id === questId),
+  );
+  const visibleQuestIds = new Set(visibleQuests.map((quest) => quest.id));
+  const subQuests = Array.isArray(value.subQuests)
+    ? value.subQuests
+        .map(normalizeSubQuest)
+        .filter((subQuest): subQuest is SubQuest => subQuest !== null && visibleQuestIds.has(subQuest.questId))
+    : [];
+  const subQuestIds = new Set(subQuests.map((subQuest) => subQuest.id));
+  const completedSubQuestIds = Array.isArray(value.completedSubQuestIds)
+    ? [...new Set(value.completedSubQuestIds.filter((subQuestId) => typeof subQuestId === 'string'))].filter(
+        (subQuestId) => subQuestIds.has(subQuestId),
+      )
+    : [];
   const settings = isRecord(value.settings)
     ? {
         reduceMotion: value.settings.reduceMotion === true,
@@ -104,8 +128,10 @@ export function normalizeGameSave(value: unknown): GameSave {
     coinBalance,
     currentStreak,
     bestStreak,
-    quests,
-    completedQuestIds,
+    quests: visibleQuests,
+    completedQuestIds: normalizedCompletedQuestIds,
+    subQuests,
+    completedSubQuestIds,
     settings,
   };
 }
@@ -177,6 +203,39 @@ function normalizeQuest(value: unknown): Quest | null {
   };
 }
 
+function normalizeSubQuest(value: unknown): SubQuest | null {
+  const title = isRecord(value) && typeof value.title === 'string'
+    ? value.title
+    : isRecord(value) && typeof value.label === 'string'
+      ? value.label
+      : null;
+
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.questId !== 'string' ||
+    title === null
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    questId: value.questId,
+    title: title.trim(),
+    createdOn: typeof value.createdOn === 'number' && Number.isFinite(value.createdOn)
+      ? value.createdOn
+      : typeof value.createdAt === 'number' && Number.isFinite(value.createdAt)
+        ? value.createdAt
+        : Date.now(),
+    completeBy: typeof value.completeBy === 'number' && Number.isFinite(value.completeBy)
+      ? value.completeBy
+      : typeof value.deadlineAt === 'number' && Number.isFinite(value.deadlineAt)
+        ? value.deadlineAt
+        : null,
+  };
+}
+
 function mergeWithStarterQuests(quests: Quest[]): Quest[] {
   const questMap = new Map<string, Quest>();
 
@@ -187,6 +246,17 @@ function mergeWithStarterQuests(quests: Quest[]): Quest[] {
   }
 
   return [...questMap.values()];
+}
+
+function normalizeLegacyCompletedQuests(value: unknown): Quest[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .filter((quest) => isRecord(quest) && typeof quest.completedAt === 'number' && Number.isFinite(quest.completedAt))
+    .map(normalizeQuest)
+    .filter((quest) => quest !== null);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

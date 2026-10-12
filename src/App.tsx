@@ -15,8 +15,11 @@ import {
 } from './gameConfig';
 import {
   addQuest,
+  addSubQuest,
   logActivity,
   removeQuest,
+  removeSubQuest,
+  toggleSubQuestCompletion,
   toggleQuestCompletion,
   undoActivity,
   useRestToken,
@@ -32,7 +35,7 @@ import {
   isDailyRentRecorded,
   isRestTokenUsedForDate,
 } from './gameMath';
-import type { Quest } from './gameTypes';
+import type { Quest, SubQuest } from './gameTypes';
 import { createDefaultSave, getLocalDateKey, loadGameSave, normalizeGameSave, saveGameSave } from './storage';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ChangeEvent, FormEvent } from 'react';
@@ -64,7 +67,16 @@ function App() {
   const [selectedActivity, setSelectedActivity] = useState<ActivityConfig | null>(null);
   const animationResetTimer = useRef<number | null>(null);
   const importInputRef = useRef<HTMLInputElement | null>(null);
-  const { activityEntries, dailyRentResults, restTokenUses, coinBalance, quests, completedQuestIds } = gameSave;
+  const {
+    activityEntries,
+    dailyRentResults,
+    restTokenUses,
+    coinBalance,
+    quests,
+    completedQuestIds,
+    subQuests,
+    completedSubQuestIds,
+  } = gameSave;
   const displayCurrentStreak = getCurrentStreak(dailyRentResults, todayDate, restTokenUses);
   const displayBestStreak = getBestStreak(dailyRentResults, restTokenUses);
   const paidRentDayCount = getPaidRentDayCount(dailyRentResults);
@@ -202,6 +214,18 @@ function App() {
     setGameSave((save) => addQuest(save, label, new Date(), undefined, deadlineAt));
   }
 
+  function handleSubQuestAdd(questId: string, title: string, completeBy: number | null) {
+    setGameSave((save) => addSubQuest(save, questId, title, new Date(), undefined, completeBy));
+  }
+
+  function handleSubQuestToggle(subQuestId: string) {
+    setGameSave((save) => toggleSubQuestCompletion(save, subQuestId));
+  }
+
+  function handleSubQuestRemove(subQuestId: string) {
+    setGameSave((save) => removeSubQuest(save, subQuestId));
+  }
+
   function showGameFeedback(feedback: GameActionFeedback | null) {
     if (!feedback) {
       setFloatingFeedback(null);
@@ -304,12 +328,17 @@ function App() {
 
         <QuestLog
           completedQuestIds={completedQuestIds}
+          completedSubQuestIds={completedSubQuestIds}
           currentTime={currentTime}
           deadline={questDeadline}
           onQuestAdd={handleQuestAdd}
           onQuestRemove={handleQuestRemove}
           onQuestToggle={handleQuestToggle}
+          onSubQuestAdd={handleSubQuestAdd}
+          onSubQuestRemove={handleSubQuestRemove}
+          onSubQuestToggle={handleSubQuestToggle}
           quests={quests}
+          subQuests={subQuests}
         />
 
         <section className="activityLog pixelPanel" aria-labelledby="log-title">
@@ -385,25 +414,39 @@ function StatusChip({ label, value }: { label: string; value: string }) {
 
 function QuestLog({
   completedQuestIds,
+  completedSubQuestIds,
   currentTime,
   deadline,
   onQuestAdd,
   onQuestRemove,
   onQuestToggle,
+  onSubQuestAdd,
+  onSubQuestRemove,
+  onSubQuestToggle,
   quests,
+  subQuests,
 }: {
   completedQuestIds: string[];
+  completedSubQuestIds: string[];
   currentTime: Date;
   deadline: Date;
   onQuestAdd: (label: string, deadlineAt: number | null) => void;
   onQuestRemove: (questId: string) => void;
   onQuestToggle: (questId: string) => void;
+  onSubQuestAdd: (questId: string, title: string, completeBy: number | null) => void;
+  onSubQuestRemove: (subQuestId: string) => void;
+  onSubQuestToggle: (subQuestId: string) => void;
   quests: Quest[];
+  subQuests: SubQuest[];
 }) {
   const [newQuestLabel, setNewQuestLabel] = useState('');
   const [newQuestDeadline, setNewQuestDeadline] = useState('');
+  const [newSubQuestLabels, setNewSubQuestLabels] = useState<Record<string, string>>({});
+  const [newSubQuestDeadlines, setNewSubQuestDeadlines] = useState<Record<string, string>>({});
+  const [expandedQuestId, setExpandedQuestId] = useState<string | null>(null);
   const timeLeft = getCountdownParts(currentTime, deadline);
   const completedQuestIdSet = new Set(completedQuestIds);
+  const completedSubQuestIdSet = new Set(completedSubQuestIds);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -417,6 +460,27 @@ function QuestLog({
     onQuestAdd(newQuestLabel, Number.isFinite(parsedDeadline) ? parsedDeadline : null);
     setNewQuestLabel('');
     setNewQuestDeadline('');
+  }
+
+  function handleSubQuestSubmit(event: FormEvent<HTMLFormElement>, questId: string) {
+    event.preventDefault();
+
+    const label = newSubQuestLabels[questId] ?? '';
+
+    if (!label.trim()) {
+      return;
+    }
+
+    const deadline = newSubQuestDeadlines[questId] ?? '';
+    const parsedDeadline = deadline ? new Date(deadline).getTime() : null;
+
+    onSubQuestAdd(questId, label, Number.isFinite(parsedDeadline) ? parsedDeadline : null);
+    setNewSubQuestLabels((labels) => ({ ...labels, [questId]: '' }));
+    setNewSubQuestDeadlines((deadlines) => ({ ...deadlines, [questId]: '' }));
+  }
+
+  function handleQuestExpansionToggle(questId: string) {
+    setExpandedQuestId((currentQuestId) => (currentQuestId === questId ? null : questId));
   }
 
   return (
@@ -437,33 +501,108 @@ function QuestLog({
         <span>{timeLeft.seconds}</span>
         <small>sec</small>
       </div>
-      <p className="questReward">Quest reward: +{questCompletionCoinReward} coins</p>
+      <div className="questToolbar">
+        <p className="questReward">Quest reward: +{questCompletionCoinReward} coins</p>
+      </div>
       <ul className="questList">
-        {quests.map((quest) => (
-          <li key={quest.id}>
-            <label>
-              <input
-                checked={completedQuestIdSet.has(quest.id)}
-                onChange={() => onQuestToggle(quest.id)}
-                type="checkbox"
-              />
-              <span>
-                <strong>{quest.label}</strong>
-                {quest.deadlineAt ? (
-                  <small className="questDeadline">{formatQuestCountdown(currentTime, quest.deadlineAt)}</small>
-                ) : null}
-              </span>
-            </label>
-            <button
-              aria-label={`Remove ${quest.label}`}
-              className="questRemoveButton"
-              type="button"
-              onClick={() => onQuestRemove(quest.id)}
-            >
-              Remove
-            </button>
-          </li>
-        ))}
+        {quests.map((quest) => {
+          const questSubQuests = subQuests.filter((subQuest) => subQuest.questId === quest.id);
+          const isQuestExpanded = expandedQuestId === quest.id;
+
+          return (
+            <li key={quest.id}>
+              <div className="questRow">
+                <label className="questCompleteToggle">
+                  <input
+                    checked={completedQuestIdSet.has(quest.id)}
+                    onChange={() => onQuestToggle(quest.id)}
+                    type="checkbox"
+                  />
+                  <span>
+                    <strong>{quest.label}</strong>
+                    {quest.deadlineAt ? (
+                      <small className="questDeadline">{formatQuestCountdown(currentTime, quest.deadlineAt)}</small>
+                    ) : null}
+                  </span>
+                </label>
+                <div className="questRowActions">
+                  <button
+                    aria-expanded={isQuestExpanded}
+                    aria-label={`${isQuestExpanded ? 'Collapse' : 'Expand'} ${quest.label} sub-quests`}
+                    className="questExpandButton"
+                    type="button"
+                    onClick={() => handleQuestExpansionToggle(quest.id)}
+                  >
+                    {isQuestExpanded ? '-' : '+'}
+                  </button>
+                  <button
+                    aria-label={`Remove ${quest.label}`}
+                    className="questRemoveButton"
+                    type="button"
+                    onClick={() => onQuestRemove(quest.id)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+              {isQuestExpanded ? (
+                <div className="subQuestArea">
+                  {questSubQuests.length > 0 ? (
+                    <ul className="subQuestList">
+                      {questSubQuests.map((subQuest) => (
+                        <li key={subQuest.id}>
+                          <label>
+                            <input
+                              checked={completedSubQuestIdSet.has(subQuest.id)}
+                              onChange={() => onSubQuestToggle(subQuest.id)}
+                              type="checkbox"
+                            />
+                            <span>
+                              {subQuest.title}
+                              {subQuest.completeBy ? (
+                                <small className="questDeadline">
+                                  {formatQuestCountdown(currentTime, subQuest.completeBy)}
+                                </small>
+                              ) : null}
+                            </span>
+                          </label>
+                          <button
+                            aria-label={`Remove ${subQuest.title}`}
+                            className="subQuestRemoveButton"
+                            type="button"
+                            onClick={() => onSubQuestRemove(subQuest.id)}
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <form className="subQuestAddForm" onSubmit={(event) => handleSubQuestSubmit(event, quest.id)}>
+                    <input
+                      aria-label={`New step for ${quest.label}`}
+                      onChange={(event) =>
+                        setNewSubQuestLabels((labels) => ({ ...labels, [quest.id]: event.target.value }))
+                      }
+                      placeholder="Add a step"
+                      type="text"
+                      value={newSubQuestLabels[quest.id] ?? ''}
+                    />
+                    <input
+                      aria-label={`Step deadline for ${quest.label}`}
+                      onChange={(event) =>
+                        setNewSubQuestDeadlines((deadlines) => ({ ...deadlines, [quest.id]: event.target.value }))
+                      }
+                      type="datetime-local"
+                      value={newSubQuestDeadlines[quest.id] ?? ''}
+                    />
+                    <button type="submit">Add Step</button>
+                  </form>
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
       <form className="questAddForm" onSubmit={handleSubmit}>
         <input

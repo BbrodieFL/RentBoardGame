@@ -9,7 +9,7 @@ import {
   saveGameSave,
 } from './storage';
 import { maxCoinBalance, restTokenCost, starterQuests } from './gameConfig';
-import type { ActivityEntry, Quest, RestTokenUse } from './gameTypes';
+import type { ActivityEntry, Quest, RestTokenUse, SubQuest } from './gameTypes';
 
 class MemoryStorage {
   private values = new Map<string, string>();
@@ -52,6 +52,19 @@ const validQuest: Quest = {
   deadlineAt: new Date('2026-10-01T12:00:00').getTime(),
 };
 
+const validSubQuest: SubQuest = {
+  id: 'outline-essay',
+  questId: 'write-essay',
+  title: 'Outline the argument',
+  createdOn: new Date('2026-09-15T12:00:00').getTime(),
+  completeBy: new Date('2026-09-20T12:00:00').getTime(),
+};
+
+const legacyCompletedQuest = {
+  ...validQuest,
+  completedAt: new Date('2026-10-02T12:00:00').getTime(),
+};
+
 describe('storage', () => {
   it('creates an empty versioned save by default', () => {
     expect(createDefaultSave()).toEqual({
@@ -64,6 +77,8 @@ describe('storage', () => {
       bestStreak: 0,
       quests: starterQuests,
       completedQuestIds: [],
+      subQuests: [],
+      completedSubQuestIds: [],
       settings: {
         reduceMotion: false,
       },
@@ -88,6 +103,8 @@ describe('storage', () => {
         bestStreak: 1,
         quests: [...starterQuests, validQuest],
         completedQuestIds: ['http-server'],
+        subQuests: [validSubQuest],
+        completedSubQuestIds: ['outline-essay'],
         settings: {
           reduceMotion: true,
         },
@@ -105,6 +122,8 @@ describe('storage', () => {
       bestStreak: 0,
       quests: [...starterQuests, validQuest],
       completedQuestIds: ['http-server'],
+      subQuests: [validSubQuest],
+      completedSubQuestIds: ['outline-essay'],
       settings: {
         reduceMotion: true,
       },
@@ -127,6 +146,8 @@ describe('storage', () => {
       bestStreak: 0,
       quests: starterQuests,
       completedQuestIds: [],
+      subQuests: [],
+      completedSubQuestIds: [],
       settings: {
         reduceMotion: false,
       },
@@ -195,5 +216,49 @@ describe('storage', () => {
     });
 
     expect(normalized.quests).toEqual([...starterQuests, validQuest]);
+  });
+
+  it('keeps valid sub-quests and drops malformed or orphaned ones', () => {
+    const normalized = normalizeGameSave({
+      schemaVersion: currentSchemaVersion,
+      activityEntries: [],
+      quests: [validQuest],
+      subQuests: [
+        validSubQuest,
+        {
+          id: 'orphan-step',
+          questId: 'missing-quest',
+          title: 'Lost step',
+          createdOn: new Date('2026-09-15T12:00:00').getTime(),
+          completeBy: null,
+        },
+        {
+          id: 'bad-step',
+          questId: 'write-essay',
+        },
+      ],
+      completedSubQuestIds: ['outline-essay', 'bad-step'],
+    });
+
+    expect(normalized.subQuests).toEqual([validSubQuest]);
+    expect(normalized.completedSubQuestIds).toEqual(['outline-essay']);
+  });
+
+  it('folds legacy completed quest archive records back into quests', () => {
+    const normalized = normalizeGameSave({
+      schemaVersion: currentSchemaVersion,
+      activityEntries: [],
+      completedQuests: [
+        legacyCompletedQuest,
+        {
+          id: 'bad-completed-quest',
+          label: 'Bad completed quest',
+          completedAt: 'yesterday',
+        },
+      ],
+    });
+
+    expect(normalized.quests).toEqual([...starterQuests, validQuest]);
+    expect(normalized.completedQuestIds).toEqual([]);
   });
 });
